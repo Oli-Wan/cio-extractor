@@ -1,10 +1,10 @@
 var fs = require('fs'),
     Iconv = require('iconv').Iconv,
-    fieldSeparator = "|";
+    fieldSeparator = "|",
+    path = "cio-data/";
 
 exports.load = function () {
-    var files = []
-    var path = "cio-data/";
+    var files = [];
     files.fiches = parseFile(path + "FICHE.txt");
     files.specialites = parseFile(path + "SPECIALITE.txt");
     files.compositions = parseFile(path + "COMPOSITION.txt");

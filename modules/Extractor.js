@@ -12,8 +12,32 @@ exports.extract = function (data, dico) {
     fiches = apply(fiches, data.formes, extractForme);
     fiches = apply(fiches, data.voies, extractVoie);
     fiches = apply(fiches, data.libelleStructure, extractLibelleStructure);
+
+    var flattenComp = function (fiche) {
+        fiche.composants = flatten(fiche.composants);
+        return fiche;
+    };
+
+    fiches = flatten(fiches, [flattenComp]);
     return fiches;
 };
+
+function flatten(obj, hooks) {
+    if (!hooks)
+        hooks = [];
+
+    var keys = Object.keys(obj);
+    var collection = [];
+    keys.forEach(function (key) {
+        var innerObject = obj[key];
+        hooks.forEach(function (hook) {
+            innerObject = hook(innerObject);
+        });
+        collection.push(innerObject);
+    });
+    return collection;
+
+}
 
 function apply(documents, records, f) {
     records.forEach(function (line) {
@@ -82,19 +106,16 @@ function extractVqr(line, fiche) {
 }
 function extractForme(line, fiche) {
     var codeForme = line[1];
-    return extractNameAndShortcut(fiche, "forme", codeForme, dictionnaries.dico_forme);
+    return extractAbregeAndComplet(dictionnaries.dico_forme, fiche, "forme", codeForme, true);
 }
 
 function extractVoie(line, fiche) {
     var codeVoie = line[1];
-    return extractNameAndShortcut(fiche, "voie", codeVoie, dictionnaries.dico_voie);
+    return extractAbregeAndComplet(dictionnaries.dico_voie, fiche, "voie", codeVoie, true);
 }
 
-function extractNameAndShortcut(fiche, key, code, dictionnary) {
-    fiche[key] = {
-        complet: dictionnary[code][2],
-        abbreviation: dictionnary[code][3]
-    };
+function removeKeysComposants(line, fiche) {
+    fiche.composants = removeKeys(fiche.composants);
     return fiche;
 }
 
@@ -166,17 +187,14 @@ function extractPresentation(line, index) {
 }
 
 function extractQuantite(line, index) {
-
     var obj = {
         type: line[index],
         valeurs: []
     };
-
     obj.valeurs.push(extractValueAndUnity(line, index + 1));
     obj.valeurs.push(extractValueAndUnity(line, index + 3));
     obj.valeurs.push(extractValueAndUnity(line, index + 5));
     obj.reference = extractValueAndUnity(line, index + 7);
-
     return obj;
 }
 
@@ -184,22 +202,24 @@ function extractValueAndUnity(line, index, obj) {
     if (!obj)
         obj = {};
 
-    if (line[index].length > 0)
-        obj.quantite = line[index];
-
-    if (line[index + 1].length > 0) {
-        var value = dictionnaries.table_u_qte[line[index + 1]];
-        obj.unite = value ? value[2] : line[index + 1]; // inconsistent data guard
-    }
+    obj.quantite = line[index];
+    var dicoUnity = dictionnaries.table_u_qte[line[index + 1]];
+    obj.unite = dicoUnity ? dicoUnity[2] : line[index + 1];
     return obj;
 }
 
-function extractAbregeAndComplet(dico, obj, property, code) {
-    if (code) {
-        obj[property] = {
-            abrege: dico[code][2],
-            complet: dico[code][3]
-        }
+function extractAbregeAndComplet(dico, obj, property, code, completFirst) {
+    var dicoLine = dico[code];
+    var abregeIndex = 2;
+    var completIndex = 3;
+
+    if (completFirst) {
+        completIndex = 2;
+        abregeIndex = 3;
+    }
+    obj[property] = {
+        abrege: dicoLine ? dicoLine[abregeIndex] : "",
+        complet: dicoLine ? dicoLine[completIndex] : ""
     }
     return obj;
 }
