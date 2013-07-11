@@ -1,0 +1,11 @@
+{
+    "name": "cio-extractor",
+    "version": "0.0.1",
+    "private": true,
+    "scripts": {
+        "start": "node extractor.js"
+    },
+    "dependencies": {
+        "iconv": "2.0.6"
+    }
+}
