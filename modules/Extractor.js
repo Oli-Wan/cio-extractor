@@ -82,20 +82,12 @@ function extractVqr(line, fiche) {
 }
 function extractForme(line, fiche) {
     var codeForme = line[1];
-    return extractNameAndShortcut(fiche, "forme", codeForme, dictionnaries.dico_forme);
+    return extractAbregeAndComplet(dictionnaries.dico_forme, fiche, "forme", codeForme, true);
 }
 
 function extractVoie(line, fiche) {
     var codeVoie = line[1];
-    return extractNameAndShortcut(fiche, "voie", codeVoie, dictionnaries.dico_voie);
-}
-
-function extractNameAndShortcut(fiche, key, code, dictionnary) {
-    fiche[key] = {
-        complet: dictionnary[code][2],
-        abbreviation: dictionnary[code][3]
-    };
-    return fiche;
+    return extractAbregeAndComplet(dictionnaries.dico_voie, fiche, "voie", codeVoie, true);
 }
 
 function extractLibelleStructure(line, fiche) {
@@ -187,11 +179,18 @@ function extractValueAndUnity(line, index, obj) {
     return obj;
 }
 
-function extractAbregeAndComplet(dico, obj, property, code) {
+function extractAbregeAndComplet(dico, obj, property, code, completFirst) {
     var dicoLine = dico[code];
+    var abregeIndex = 2;
+    var completIndex = 3;
+
+    if (completFirst) {
+        completIndex = 2;
+        abregeIndex = 3;
+    }
     obj[property] = {
-        abrege: dicoLine ? dicoLine[2] : "",
-        complet: dicoLine ? dicoLine[3] : ""
+        abrege: dicoLine ? dicoLine[abregeIndex] : "",
+        complet: dicoLine ? dicoLine[completIndex] : ""
     }
     return obj;
 }
