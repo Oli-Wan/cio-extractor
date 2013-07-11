@@ -166,17 +166,14 @@ function extractPresentation(line, index) {
 }
 
 function extractQuantite(line, index) {
-
     var obj = {
         type: line[index],
         valeurs: []
     };
-
     obj.valeurs.push(extractValueAndUnity(line, index + 1));
     obj.valeurs.push(extractValueAndUnity(line, index + 3));
     obj.valeurs.push(extractValueAndUnity(line, index + 5));
     obj.reference = extractValueAndUnity(line, index + 7);
-
     return obj;
 }
 
@@ -184,22 +181,17 @@ function extractValueAndUnity(line, index, obj) {
     if (!obj)
         obj = {};
 
-    if (line[index].length > 0)
-        obj.quantite = line[index];
-
-    if (line[index + 1].length > 0) {
-        var value = dictionnaries.table_u_qte[line[index + 1]];
-        obj.unite = value ? value[2] : line[index + 1]; // inconsistent data guard
-    }
+    obj.quantite = line[index];
+    var dicoUnity = dictionnaries.table_u_qte[line[index + 1]];
+    obj.unite = dicoUnity ? dicoUnity[2] : line[index + 1];
     return obj;
 }
 
 function extractAbregeAndComplet(dico, obj, property, code) {
-    if (code) {
-        obj[property] = {
-            abrege: dico[code][2],
-            complet: dico[code][3]
-        }
+    var dicoLine = dico[code];
+    obj[property] = {
+        abrege: dicoLine ? dicoLine[2] : "",
+        complet: dicoLine ? dicoLine[3] : ""
     }
     return obj;
 }
