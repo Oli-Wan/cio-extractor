@@ -6,6 +6,7 @@
         "start": "node extractor.js"
     },
     "dependencies": {
-        "iconv": "2.0.6"
+        "iconv": "2.0.6",
+        "couchdb-api": "1.2.2"
     }
 }

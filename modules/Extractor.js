@@ -12,8 +12,32 @@ exports.extract = function (data, dico) {
     fiches = apply(fiches, data.formes, extractForme);
     fiches = apply(fiches, data.voies, extractVoie);
     fiches = apply(fiches, data.libelleStructure, extractLibelleStructure);
+
+    var flattenComp = function (fiche) {
+        fiche.composants = flatten(fiche.composants);
+        return fiche;
+    };
+
+    fiches = flatten(fiches, [flattenComp]);
     return fiches;
 };
+
+function flatten(obj, hooks) {
+    if (!hooks)
+        hooks = [];
+
+    var keys = Object.keys(obj);
+    var collection = [];
+    keys.forEach(function (key) {
+        var innerObject = obj[key];
+        hooks.forEach(function (hook) {
+            innerObject = hook(innerObject);
+        });
+        collection.push(innerObject);
+    });
+    return collection;
+
+}
 
 function apply(documents, records, f) {
     records.forEach(function (line) {
@@ -88,6 +112,11 @@ function extractForme(line, fiche) {
 function extractVoie(line, fiche) {
     var codeVoie = line[1];
     return extractAbregeAndComplet(dictionnaries.dico_voie, fiche, "voie", codeVoie, true);
+}
+
+function removeKeysComposants(line, fiche) {
+    fiche.composants = removeKeys(fiche.composants);
+    return fiche;
 }
 
 function extractLibelleStructure(line, fiche) {
