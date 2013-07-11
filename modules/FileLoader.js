@@ -1,7 +1,7 @@
 var fs = require('fs'),
     Iconv = require('iconv').Iconv,
     fieldSeparator = "|",
-    path = "cio-data/";
+    path = "path/to/cio/files/";
 
 exports.load = function () {
     var files = [];
